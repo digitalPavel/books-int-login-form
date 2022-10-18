@@ -1,0 +1,41 @@
+﻿@page "/verifyauth"
+
+<h3>VerifyAuth</h3>
+
+@if (isAuthenticated)
+{
+    <h4>@userName is authenticated</h4>
+    <ul>
+        <li>Access to Admin Role: @isUser</li>
+    </ul>
+}
+else
+{
+    <h4>The user is not authenticated</h4>
+}
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } // Provide inaormation about currently auth user
+
+    private bool isAuthenticated = false;
+    private string userName;
+    private bool isUser = false;// Our role in system 
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            isAuthenticated = true;
+
+            userName = authState.User.FindFirst(ClaimTypes.Name).Value; // On the user we are finding a claim and the claim and we are looking for is name
+
+            isUser = authState.User.IsInRole("User");
+
+        }
+    }
+
+}

@@ -1,0 +1,64 @@
+﻿@layout LoginLayout
+@page "/"
+@inject IAuthenticationService AuthService
+@inject NavigationManager NavManeger
+
+@*@if(showAuthenticationError)
+{
+    <div class="alert alert-danger" role="alert">
+        @authenticationErrorText
+    </div>
+}*@
+
+<form class="row g-3">
+   <div class="slideDown">
+    <img src="BI_logo_highres.png">
+        <EditForm Model="@model" OnValidSubmit="ExecuteLogin">
+            <DataAnnotationsValidator />
+        <div class="col-md-4">
+            <label for="validationDefault01" class="form-label">Login</label>
+        <InputText @bind-Value="model.Login" type="text" placeholder="Login" id="validationDefault01" required />
+                <ValidationMessage For="@(() => model.Login)" /> 
+        </div>          
+        <div class="col-md-4">       
+            <label for="validationDefault01" class="form-label">Password</label>
+        <InputText @bind-Value="model.Password" type="password" placeholder="Password" id="validationDefault02" required />
+                <ValidationMessage For="@(() => model.Password)" />
+        </div>
+        <button class="button"><span>Log In</span></button>
+        
+        <br /><br />
+
+        @if (showAuthenticationError)
+        {
+
+            <p class="alert alert-danger" role="alert">@authenticationErrorText</p>
+
+        }
+        </EditForm>
+   </div>
+</form>
+
+@code {
+    private AuthenticationUserModel model = new();
+
+    private bool showAuthenticationError = false;
+    private string authenticationErrorText = "";
+
+    private async Task ExecuteLogin()
+    {
+        showAuthenticationError = false;
+
+        AuthenticatedUserModel result = await AuthService.Login(model);
+
+        if (result != null)
+        {
+            NavManeger.NavigateTo("/");// Navigate to the page what we try to get
+        }
+        else
+        {
+            authenticationErrorText = "There was an error when trying to log in";
+            showAuthenticationError = true;
+        }
+    }
+}
